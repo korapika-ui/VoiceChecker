@@ -30,6 +30,7 @@ namespace VoiceChecker
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Home));
             this.panel1 = new System.Windows.Forms.Panel();
             this.txtTitle = new System.Windows.Forms.TextBox();
             this.btnChangeFolder = new System.Windows.Forms.Button();
@@ -43,7 +44,11 @@ namespace VoiceChecker
             this.btnSus = new System.Windows.Forms.Button();
             this.mainTip = new System.Windows.Forms.ToolTip(this.components);
             this.btnInfo = new System.Windows.Forms.Button();
+            this.mediaPlayer = new AxWMPLib.AxWindowsMediaPlayer();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.label1 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).BeginInit();
             this.SuspendLayout();
             // 
             // panel1
@@ -67,7 +72,7 @@ namespace VoiceChecker
             // 
             // btnChangeFolder
             // 
-            this.btnChangeFolder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnChangeFolder.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnChangeFolder.Font = new System.Drawing.Font("K24 Kurdish Light Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnChangeFolder.Location = new System.Drawing.Point(693, 6);
             this.btnChangeFolder.Name = "btnChangeFolder";
@@ -79,7 +84,7 @@ namespace VoiceChecker
             // 
             // btnOpen
             // 
-            this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnOpen.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnOpen.Font = new System.Drawing.Font("K24 Kurdish Light Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnOpen.Location = new System.Drawing.Point(693, 48);
             this.btnOpen.Name = "btnOpen";
@@ -93,7 +98,7 @@ namespace VoiceChecker
             // 
             this.txtInfo.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.txtInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.txtInfo.Location = new System.Drawing.Point(9, 87);
+            this.txtInfo.Location = new System.Drawing.Point(4, 92);
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.Size = new System.Drawing.Size(788, 96);
             this.txtInfo.TabIndex = 20;
@@ -101,28 +106,32 @@ namespace VoiceChecker
             // txtCurrentFolder
             // 
             this.txtCurrentFolder.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.txtCurrentFolder.Location = new System.Drawing.Point(9, 46);
+            this.txtCurrentFolder.Location = new System.Drawing.Point(9, 50);
             this.txtCurrentFolder.Name = "txtCurrentFolder";
             this.txtCurrentFolder.Size = new System.Drawing.Size(788, 24);
             this.txtCurrentFolder.TabIndex = 19;
             // 
             // btnRepeat
             // 
+            this.btnRepeat.BackColor = System.Drawing.Color.Transparent;
+            this.btnRepeat.BackgroundImage = global::VoiceChecker.Properties.Resources.replay_icon;
+            this.btnRepeat.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.btnRepeat.FlatAppearance.BorderSize = 0;
             this.btnRepeat.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnRepeat.Font = new System.Drawing.Font("K24 Kurdish Light Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.btnRepeat.Location = new System.Drawing.Point(13, 6);
+            this.btnRepeat.ForeColor = System.Drawing.Color.Black;
+            this.btnRepeat.Location = new System.Drawing.Point(44, 198);
             this.btnRepeat.Name = "btnRepeat";
-            this.btnRepeat.Size = new System.Drawing.Size(104, 26);
+            this.btnRepeat.Size = new System.Drawing.Size(40, 40);
             this.btnRepeat.TabIndex = 18;
-            this.btnRepeat.Text = "دووبارەکردنەوە";
-            this.btnRepeat.UseVisualStyleBackColor = true;
+            this.btnRepeat.UseVisualStyleBackColor = false;
             this.btnRepeat.Click += new System.EventHandler(this.btnRepeat_Click);
             // 
             // btnLoad
             // 
             this.btnLoad.BackColor = System.Drawing.Color.Red;
-            this.btnLoad.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnLoad.Font = new System.Drawing.Font("K24 Kurdish Light Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.btnLoad.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.btnLoad.Font = new System.Drawing.Font("K24 Kurdish Light Light", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnLoad.Location = new System.Drawing.Point(578, 6);
             this.btnLoad.Name = "btnLoad";
             this.btnLoad.Size = new System.Drawing.Size(104, 26);
@@ -134,10 +143,10 @@ namespace VoiceChecker
             // btnTrash
             // 
             this.btnTrash.BackColor = System.Drawing.Color.Red;
-            this.btnTrash.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTrash.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnTrash.Font = new System.Drawing.Font("K24 Kurdish Light Light", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnTrash.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnTrash.Location = new System.Drawing.Point(131, 234);
+            this.btnTrash.Location = new System.Drawing.Point(137, 244);
             this.btnTrash.Name = "btnTrash";
             this.btnTrash.Size = new System.Drawing.Size(182, 50);
             this.btnTrash.TabIndex = 16;
@@ -148,10 +157,10 @@ namespace VoiceChecker
             // btnGood
             // 
             this.btnGood.BackColor = System.Drawing.SystemColors.Desktop;
-            this.btnGood.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnGood.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnGood.Font = new System.Drawing.Font("K24 Kurdish Light Light", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnGood.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnGood.Location = new System.Drawing.Point(507, 234);
+            this.btnGood.Location = new System.Drawing.Point(513, 244);
             this.btnGood.Name = "btnGood";
             this.btnGood.Size = new System.Drawing.Size(182, 50);
             this.btnGood.TabIndex = 15;
@@ -162,10 +171,10 @@ namespace VoiceChecker
             // btnSus
             // 
             this.btnSus.BackColor = System.Drawing.Color.Gold;
-            this.btnSus.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnSus.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnSus.Font = new System.Drawing.Font("K24 Kurdish Light Light", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
             this.btnSus.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
-            this.btnSus.Location = new System.Drawing.Point(319, 234);
+            this.btnSus.Location = new System.Drawing.Point(325, 244);
             this.btnSus.Name = "btnSus";
             this.btnSus.Size = new System.Drawing.Size(182, 50);
             this.btnSus.TabIndex = 14;
@@ -175,9 +184,9 @@ namespace VoiceChecker
             // 
             // btnInfo
             // 
-            this.btnInfo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnInfo.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.btnInfo.Font = new System.Drawing.Font("K24 Kurdish Light Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.btnInfo.Location = new System.Drawing.Point(278, 6);
+            this.btnInfo.Location = new System.Drawing.Point(424, 6);
             this.btnInfo.Name = "btnInfo";
             this.btnInfo.Size = new System.Drawing.Size(148, 26);
             this.btnInfo.TabIndex = 22;
@@ -185,11 +194,36 @@ namespace VoiceChecker
             this.btnInfo.UseVisualStyleBackColor = true;
             this.btnInfo.Click += new System.EventHandler(this.btnInfo_Click);
             // 
+            // mediaPlayer
+            // 
+            this.mediaPlayer.Enabled = true;
+            this.mediaPlayer.Location = new System.Drawing.Point(137, 191);
+            this.mediaPlayer.Name = "mediaPlayer";
+            this.mediaPlayer.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("mediaPlayer.OcxState")));
+            this.mediaPlayer.Size = new System.Drawing.Size(558, 47);
+            this.mediaPlayer.TabIndex = 23;
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("K24 Kurdish Light Light", 14F);
+            this.label1.Location = new System.Drawing.Point(12, 241);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(108, 21);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "دووبارەکردنەوە";
+            // 
             // Home
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.mediaPlayer);
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.btnChangeFolder);
             this.Controls.Add(this.btnOpen);
@@ -206,7 +240,9 @@ namespace VoiceChecker
             this.Load += new System.EventHandler(this.Home_Load);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.mediaPlayer)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -225,6 +261,9 @@ namespace VoiceChecker
         private System.Windows.Forms.Button btnSus;
         private System.Windows.Forms.ToolTip mainTip;
         private System.Windows.Forms.Button btnInfo;
+        private AxWMPLib.AxWindowsMediaPlayer mediaPlayer;
+        private System.Windows.Forms.OpenFileDialog openFileDialog1;
+        private System.Windows.Forms.Label label1;
     }
 }
 

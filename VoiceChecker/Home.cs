@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,6 +12,7 @@ namespace VoiceChecker
 {
     public partial class Home : Form
     {
+        public string AudioType = ".wav";
         public Home()
         {
             InitializeComponent();
@@ -28,12 +26,7 @@ namespace VoiceChecker
         private int currentIndex = -1;
         private bool textChanged;
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
 
-            
-
-        }
         private void LoadData()
         {
             if (!Directory.Exists(folderPath))
@@ -48,11 +41,28 @@ namespace VoiceChecker
             foreach (string file in Directory.EnumerateFiles(folderPath, "*.txt"))
             {
                 var fileName = Path.GetFileNameWithoutExtension(file);
-                if (!FileExists(folderPath + "/" + fileName + ".wav"))
+                //check if any audio files exist
+                if (!FileExists(folderPath, fileName, ".wav") &&
+                    !FileExists(folderPath, fileName, ".mp3"))
                 {
-                    MessageBox.Show("ئەم فۆڵدەرە تەواو نیە");
+                    MessageBox.Show(fileName+"ئەم فایلە دەنگی نیە، لێرەدا رادەوستێت ");
                     return;
                 }
+
+
+                // this is garbage way of doing this, but i am too lazy to do it the right way :)
+                if (FileExists(folderPath, fileName, ".wav"))
+                {
+                    AudioType = ".wav";
+                }
+                else if (FileExists(folderPath, fileName, ".mp3"))
+                {
+                    AudioType = ".mp3";
+                }
+
+
+               
+
                 string contents = File.ReadAllText(file);
                 titles.Add(contents);
                 files.Add(fileName);
@@ -60,6 +70,7 @@ namespace VoiceChecker
 
 
             currentIndex = -1;
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -72,10 +83,13 @@ namespace VoiceChecker
                 {
                     folderPath = fbd.SelectedPath;
                     UpdateFolderPath();
+
+                    LoadData();
+                    LoadNextFile();
                 }
             }
 
-            LoadData();
+           
         }
 
         private void UpdateFolderPath()
@@ -109,9 +123,15 @@ namespace VoiceChecker
 
         private void PlayAudio(string path)
         {
-            var soundPlayer = new System.Media.SoundPlayer();
-            soundPlayer.SoundLocation = path;
-            soundPlayer.Play();
+
+            mediaPlayer.URL = path;
+            mediaPlayer.Ctlcontrols.play();
+
+            //var soundPlayer = new System.Media.SoundPlayer
+            //{
+            //    SoundLocation = path
+            //};
+            //soundPlayer.Play();
         }
 
         private void btnGood_Click(object sender, EventArgs e)
@@ -122,20 +142,27 @@ namespace VoiceChecker
                 return;
             }
 
+            StopPlayingMediea();
+
             ValidateText();
             Directory.CreateDirectory($"{folderPath}/Good");
 
             string root1 = $"{folderPath}/{files[currentIndex]}.txt";
-            string root2 = $"{folderPath}/{files[currentIndex]}.wav";
+            string root2 = $"{folderPath}/{files[currentIndex]}{AudioType}";
 
             string dest1 = $"{folderPath}/Good/{files[currentIndex]}.txt";
-            string dest2 = $"{folderPath}/Good/{files[currentIndex]}.wav";
+            string dest2 = $"{folderPath}/Good/{files[currentIndex]}{AudioType}";
 
-
-            MoveFile(root1, dest1);
-            MoveFile(root2, dest2);
+            
+            Task.Run(() => MoveFile(root1, dest1));
+            Task.Run(() => MoveFile(root2, dest2));
 
             LoadNextFile();
+        }
+
+        private void StopPlayingMediea()
+        {
+            mediaPlayer.Ctlcontrols.stop();
         }
 
         private void ValidateText()
@@ -159,18 +186,19 @@ namespace VoiceChecker
                 MessageBox.Show("تکایە فۆڵدەرێکی تەواو دیاری بکە");
                 return;
             }
+            StopPlayingMediea();
 
             Directory.CreateDirectory($"{folderPath}/Sus");
 
             string root1 = $"{folderPath}/{files[currentIndex]}.txt";
-            string root2 = $"{folderPath}/{files[currentIndex]}.wav";
+            string root2 = $"{folderPath}/{files[currentIndex]}{AudioType}";
 
             string dest1 = $"{folderPath}/Sus/{files[currentIndex]}.txt";
-            string dest2 = $"{folderPath}/Sus/{files[currentIndex]}.wav";
+            string dest2 = $"{folderPath}/Sus/{files[currentIndex]}{AudioType}";
 
-
-            MoveFile(root1, dest1);
-            MoveFile(root2, dest2);
+            Task.Run(() => MoveFile(root1, dest1));
+            Task.Run(() => MoveFile(root2, dest2));
+           
 
             LoadNextFile();
         }
@@ -182,18 +210,19 @@ namespace VoiceChecker
                 MessageBox.Show("تکایە فۆڵدەرێکی تەواو دیاری بکە");
                 return;
             }
+            StopPlayingMediea();
 
             Directory.CreateDirectory($"{folderPath}/Trash");
 
             string root1 = $"{folderPath}/{files[currentIndex]}.txt";
-            string root2 = $"{folderPath}/{files[currentIndex]}.wav";
+            string root2 = $"{folderPath}/{files[currentIndex]}{AudioType}";
 
             string dest1 = $"{folderPath}/Trash/{files[currentIndex]}.txt";
-            string dest2 = $"{folderPath}/Trash/{files[currentIndex]}.wav";
+            string dest2 = $"{folderPath}/Trash/{files[currentIndex]}{AudioType}";
 
 
-            MoveFile(root1, dest1);
-            MoveFile(root2, dest2);
+            Task.Run(() => MoveFile(root1, dest1));
+            Task.Run(() => MoveFile(root2, dest2));
 
             LoadNextFile();
         }
@@ -253,9 +282,13 @@ namespace VoiceChecker
             {
                 return null;
             }
-            return folderPath + "/" + files[index] + ".wav";
+
+            return folderPath + "/" + files[index] + AudioType;
         }
 
+        /// <summary>
+        /// Open the current folder 
+        /// </summary>
         private void btnOpen_Click(object sender, EventArgs e)
         {
             if (!Directory.Exists(folderPath))
@@ -277,6 +310,10 @@ namespace VoiceChecker
             return File.Exists(path);
         }
 
+        private bool FileExists(string path, string fileName, string format)
+        {
+            return FileExists(path + "/" + fileName + format);
+        }
         private void Home_Load(object sender, EventArgs e)
         {
             folderPath = Settings.Default["folderPath"].ToString();
@@ -294,6 +331,7 @@ namespace VoiceChecker
             mainTip.SetToolTip(btnLoad, "فایلی داهاتوو بهێنە(تکایە ئاگاداربە ئەمە دووگمەیە دامەگرە تەنها ئەو کاتەنەبێ کە فۆڵدەرت گۆریەو و دەنگەکە بۆخۆی کار ناکا");
             mainTip.SetToolTip(btnOpen, "فۆلدەرکەم بۆ بکەوە");
             mainTip.SetToolTip(btnRepeat, "دەنگەکە دووبارەبکەوە");
+
         }
     }
 }
