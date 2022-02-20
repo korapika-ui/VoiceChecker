@@ -12,7 +12,9 @@ namespace VoiceChecker
 {
     public partial class Home : Form
     {
+        private List<string> archive = new List<string>();
         public string AudioType = ".wav";
+        private double speed = 1.0; // 1.0 normal 
         public Home()
         {
             InitializeComponent();
@@ -119,19 +121,45 @@ namespace VoiceChecker
             txtTitle.Text = titles[currentIndex];
             PlayAudio(GetWavPath(currentIndex));
             GenerateInformation();
+            this.Text = files[currentIndex];
         }
 
         private void PlayAudio(string path)
         {
+            mediaPlayer.settings.rate = speed;
+
+            UpdateSpeedTxt();
 
             mediaPlayer.URL = path;
             mediaPlayer.Ctlcontrols.play();
+
 
             //var soundPlayer = new System.Media.SoundPlayer
             //{
             //    SoundLocation = path
             //};
             //soundPlayer.Play();
+        }
+
+      
+
+        private void StopPlayingMediea()
+        {
+            mediaPlayer.Ctlcontrols.stop();
+        }
+
+        private void ValidateText()
+        {
+            if (textChanged)
+            {
+                File.WriteAllText($"{folderPath}/{files[currentIndex]}.txt", txtTitle.Text);
+                textChanged = false;
+            }
+        }
+
+        private void MoveFile(string path, string path2)
+        {
+            File.Move(path, path2);
         }
 
         private void btnGood_Click(object sender, EventArgs e)
@@ -153,30 +181,12 @@ namespace VoiceChecker
             string dest1 = $"{folderPath}/Good/{files[currentIndex]}.txt";
             string dest2 = $"{folderPath}/Good/{files[currentIndex]}{AudioType}";
 
-            
+            archive.Add(files[currentIndex]);
+
             Task.Run(() => MoveFile(root1, dest1));
             Task.Run(() => MoveFile(root2, dest2));
 
             LoadNextFile();
-        }
-
-        private void StopPlayingMediea()
-        {
-            mediaPlayer.Ctlcontrols.stop();
-        }
-
-        private void ValidateText()
-        {
-            if (textChanged)
-            {
-                File.WriteAllText($"{folderPath}/{files[currentIndex]}.txt", txtTitle.Text);
-                textChanged = false;
-            }
-        }
-
-        private void MoveFile(string path, string path2)
-        {
-            File.Move(path, path2);
         }
 
         private void btnSus_Click(object sender, EventArgs e)
@@ -332,6 +342,60 @@ namespace VoiceChecker
             mainTip.SetToolTip(btnOpen, "فۆلدەرکەم بۆ بکەوە");
             mainTip.SetToolTip(btnRepeat, "دەنگەکە دووبارەبکەوە");
 
+        }
+
+        private void btnFast_Click(object sender, EventArgs e)
+        {
+            if (speed > 2)
+                return;
+
+            speed += 0.25;
+            mediaPlayer.settings.rate = speed;
+
+            UpdateSpeedTxt();
+        }
+
+
+        private void btnSlow_Click(object sender, EventArgs e)
+        {
+            if (speed <= 0.25)
+                return;
+
+            speed -= 0.25;
+            mediaPlayer.settings.rate = speed;
+
+            UpdateSpeedTxt();
+
+        }
+
+        private void btnNormal_Click(object sender, EventArgs e)
+        {
+            speed = 1.0;
+            mediaPlayer.settings.rate = speed;
+
+            UpdateSpeedTxt();
+        }
+
+
+        private void UpdateSpeedTxt()
+        {
+            txtSpeed.Text = speed.ToString();
+        }
+
+        private void btnHistory_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 100; i++)
+            {
+                archive.Add("000" + i);
+            }
+            var st = new StringBuilder();
+
+            foreach (var item in archive)
+            {
+                st.AppendLine(item);
+            }
+
+            MessageBox.Show(st.ToString());
         }
     }
 }
