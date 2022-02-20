@@ -10,17 +10,23 @@ using VoiceChecker.Properties;
 
 namespace VoiceChecker
 {
+    public enum FileTransferType
+    {
+        Good = 1,
+        Sus = 2,
+        Trash = 3
+    }
     public partial class Home : Form
     {
-        private List<string> archive = new List<string>();
+        private Dictionary<string, FileTransferType> archive = new Dictionary<string, FileTransferType>();
+
         public string AudioType = ".wav";
         private double speed = 1.0; // 1.0 normal 
-        public Home()
-        {
-            InitializeComponent();
-        }
 
-        private string folderPath = "";
+
+        History history;
+
+        public string folderPath = "";
 
         private List<string> titles;
         private List<string> files;
@@ -28,6 +34,12 @@ namespace VoiceChecker
         private int currentIndex = -1;
         private bool textChanged;
 
+
+        public Home()
+        {
+            InitializeComponent();
+            history = new History(this);
+        }
 
         private void LoadData()
         {
@@ -47,7 +59,7 @@ namespace VoiceChecker
                 if (!FileExists(folderPath, fileName, ".wav") &&
                     !FileExists(folderPath, fileName, ".mp3"))
                 {
-                    MessageBox.Show(fileName+"ئەم فایلە دەنگی نیە، لێرەدا رادەوستێت ");
+                    MessageBox.Show(fileName + "ئەم فایلە دەنگی نیە، لێرەدا رادەوستێت ");
                     return;
                 }
 
@@ -63,7 +75,7 @@ namespace VoiceChecker
                 }
 
 
-               
+
 
                 string contents = File.ReadAllText(file);
                 titles.Add(contents);
@@ -91,7 +103,7 @@ namespace VoiceChecker
                 }
             }
 
-           
+
         }
 
         private void UpdateFolderPath()
@@ -141,7 +153,7 @@ namespace VoiceChecker
             //soundPlayer.Play();
         }
 
-      
+
 
         private void StopPlayingMediea()
         {
@@ -181,7 +193,8 @@ namespace VoiceChecker
             string dest1 = $"{folderPath}/Good/{files[currentIndex]}.txt";
             string dest2 = $"{folderPath}/Good/{files[currentIndex]}{AudioType}";
 
-            archive.Add(files[currentIndex]);
+            archive.Add(files[currentIndex], FileTransferType.Good);
+            UpdateHitory();
 
             Task.Run(() => MoveFile(root1, dest1));
             Task.Run(() => MoveFile(root2, dest2));
@@ -206,9 +219,13 @@ namespace VoiceChecker
             string dest1 = $"{folderPath}/Sus/{files[currentIndex]}.txt";
             string dest2 = $"{folderPath}/Sus/{files[currentIndex]}{AudioType}";
 
+
             Task.Run(() => MoveFile(root1, dest1));
             Task.Run(() => MoveFile(root2, dest2));
-           
+
+            archive.Add(files[currentIndex], FileTransferType.Sus);
+            UpdateHitory();
+
 
             LoadNextFile();
         }
@@ -234,12 +251,15 @@ namespace VoiceChecker
             Task.Run(() => MoveFile(root1, dest1));
             Task.Run(() => MoveFile(root2, dest2));
 
+            archive.Add(files[currentIndex], FileTransferType.Trash);
+            UpdateHitory();
+
+
             LoadNextFile();
         }
 
         private void btnLoad_Click(object sender, EventArgs e)
         {
-
             LoadNextFile();
         }
 
@@ -384,18 +404,18 @@ namespace VoiceChecker
 
         private void btnHistory_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 100; i++)
-            {
-                archive.Add("000" + i);
-            }
-            var st = new StringBuilder();
+            var history = new History(this);
+            this.history = history;
 
-            foreach (var item in archive)
-            {
-                st.AppendLine(item);
-            }
+            UpdateHitory();
+            history.Show();
 
-            MessageBox.Show(st.ToString());
+        }
+
+
+        private void UpdateHitory()
+        {
+            history.LoadData(archive);
         }
     }
 }
